@@ -15,19 +15,87 @@ function ArticleForm({ addArticle }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formattedData = { ...formData, tags: formData.tags.split(",") };
-    addArticle(formattedData);
-    setFormData({ title: "", content: "", author: "", category: "", tags: "" });
+
+    // Convert tags from a comma-separated string to an array
+    const articleData = {
+      ...formData,
+      tags: formData.tags.split(",").map((tag) => tag.trim()),
+    };
+
+    // Call the addArticle function passed as a prop
+    addArticle(articleData);
+
+    // Reset the form
+    setFormData({
+      title: "",
+      content: "",
+      author: "",
+      category: "",
+      tags: "",
+    });
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input type="text" name="title" placeholder="Title" value={formData.title} onChange={handleChange} required />
-      <textarea name="content" placeholder="Content" value={formData.content} onChange={handleChange} required />
-      <input type="text" name="author" placeholder="Author ID" value={formData.author} onChange={handleChange} required />
-      <input type="text" name="category" placeholder="Category ID" value={formData.category} onChange={handleChange} required />
-      <input type="text" name="tags" placeholder="Tags (comma separated)" value={formData.tags} onChange={handleChange} />
-      <button type="submit">Publish</button>
+      <div>
+        <label>Title</label>
+        <input
+          type="text"
+          name="title"
+          placeholder="Title"
+          value={formData.title}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div>
+        <label>Content</label>
+        <textarea
+          name="content"
+          placeholder="Content"
+          value={formData.content}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div>
+        <label>Author ID</label>
+        <input
+          type="text"
+          name="author"
+          placeholder="Author ID"
+          value={formData.author}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div>
+        <label>Category ID</label>
+        <input
+          type="text"
+          name="category"
+          placeholder="Category ID"
+          value={formData.category}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div>
+        <label>Tags</label>
+        <input
+          type="text"
+          name="tags"
+          placeholder="Tags (comma separated)"
+          value={formData.tags}
+          onChange={handleChange}
+        />
+      </div>
+
+      <button type="submit">Add Article</button>
     </form>
   );
 }
