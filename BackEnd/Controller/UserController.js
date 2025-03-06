@@ -85,4 +85,39 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { getUsers, createUser, updateUser, deleteUser };
+const login = async (req, res) => {
+    const { username, password } = req.body;
+    console.log("This is the test user" ,username);
+    console.log("This is the password", password);
+    let existingUser;
+
+    try {
+        // Find the user by username
+        existingUser = await User.findOne({ username });
+        console.log("This is the test user" ,existingUser);
+
+        // If user does not exist, return an error
+        if (!existingUser) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        // Compare the provided password with the stored hashed password
+        const isPasswordValid = await existingUser.comparePassword(password);
+
+        // If the password is invalid, return an error
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: "Invalid password." });
+        }
+
+        // If both username and password are valid, return a success message
+        res.status(200).json({ message: "Login successful.", user: existingUser });
+
+    } catch (err) {
+        console.error("Error on login", err);
+        res.status(500).json({ message: "Login failed, please try again." });
+    }
+};
+
+
+
+module.exports = { getUsers, createUser, updateUser, deleteUser, login };
