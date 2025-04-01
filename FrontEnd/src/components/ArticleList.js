@@ -60,7 +60,9 @@ function ArticleList({ articles, updateArticle, deleteArticle }) {
                   </div>
                   <div>
                     <label>Content</label>
+                    <br></br>
                     <textarea
+                      style={{ width: "300px", height: "150px" }}
                       name="content"
                       value={editData.content}
                       onChange={handleChange}

@@ -34,4 +34,8 @@ body {
     background: #333;
     color: white;
   }
-  
+  .textarea-default {
+    width: 300px;
+    height: 150px;
+    resize: none; /* 禁止用户调整大小 */
+  }

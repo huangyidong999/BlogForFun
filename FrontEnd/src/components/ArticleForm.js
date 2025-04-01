@@ -51,7 +51,9 @@ function ArticleForm({ addArticle }) {
 
       <div>
         <label>Content</label>
+        <br></br>
         <textarea
+          style={{ width: "300px", height: "150px" }}
           name="content"
           placeholder="Content"
           value={formData.content}

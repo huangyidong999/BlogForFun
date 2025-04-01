@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import UserForm from "./components/UserForm";
 import UserList from "./components/UserList";
@@ -6,23 +6,21 @@ import Navbar from "./components/Navbar";
 import ArticleForm from "./components/ArticleForm";
 import ArticleList from "./components/ArticleList";
 import ArticleDisply from "./components/ArticleDisplay";
+import LoginPage from "./components/Login";
+import { AuthContext } from "./auth_context";
 
 const USER_API_URL = "http://localhost:5000/api/users";
 const ARTICLE_API_URL = "http://localhost:5000/api/articles";
 
 function App() {
+  const { isLoggedIn } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
   const [articles, setArticles] = useState([]);
 
   // Fetch users from backend
   useEffect(() => {
     fetch(USER_API_URL)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => setUsers(data.users))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -30,12 +28,7 @@ function App() {
   // Fetch articles from backend
   useEffect(() => {
     fetch(ARTICLE_API_URL)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => setArticles(data.articles))
       .catch((error) => console.error("Error fetching articles:", error));
   }, []);
@@ -44,17 +37,10 @@ function App() {
   const addUser = (newUser) => {
     fetch(USER_API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newUser),
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => setUsers([...users, data.user]))
       .catch((error) => console.error("Error adding user:", error));
   };
@@ -63,17 +49,10 @@ function App() {
   const updateUser = (id, updatedUser) => {
     fetch(`${USER_API_URL}/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedUser),
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
         setUsers(users.map((user) => (user._id === id ? data.user : user)));
       })
@@ -82,13 +61,8 @@ function App() {
 
   // Delete a user
   const deleteUser = (id) => {
-    fetch(`${USER_API_URL}/${id}`, {
-      method: "DELETE",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
+    fetch(`${USER_API_URL}/${id}`, { method: "DELETE" })
+      .then(() => {
         setUsers(users.filter((user) => user._id !== id));
       })
       .catch((error) => console.error("Error deleting user:", error));
@@ -98,17 +72,10 @@ function App() {
   const addArticle = (newArticle) => {
     fetch(ARTICLE_API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newArticle),
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => setArticles([...articles, data.article]))
       .catch((error) => console.error("Error adding article:", error));
   };
@@ -117,17 +84,10 @@ function App() {
   const updateArticle = (id, updatedArticle) => {
     fetch(`${ARTICLE_API_URL}/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedArticle),
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
         setArticles(articles.map((article) => (article._id === id ? data.article : article)));
       })
@@ -136,13 +96,8 @@ function App() {
 
   // Delete an article
   const deleteArticle = (id) => {
-    fetch(`${ARTICLE_API_URL}/${id}`, {
-      method: "DELETE",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
+    fetch(`${ARTICLE_API_URL}/${id}`, { method: "DELETE" })
+      .then(() => {
         setArticles(articles.filter((article) => article._id !== id));
       })
       .catch((error) => console.error("Error deleting article:", error));
@@ -155,48 +110,58 @@ function App() {
         <h1>Blog Management System</h1>
         <nav>
           <ul>
+            {isLoggedIn && (
+              <>
+                <li>
+                  <Link to="/users">User Management</Link>
+                </li>
+                <li>
+                  <Link to="/articles">Article Management</Link>
+                </li>
+              </>
+            )}
             <li>
-              <Link to="/users">User Management</Link>
-            </li>
-            <li>
-              <Link to="/articles">Article Management</Link>
-            </li>
-            <li>
-              <ArticleDisply></ArticleDisply>
+              <ArticleDisply />
             </li>
           </ul>
         </nav>
 
         <Routes>
-          {/* User Management Routes */}
-          <Route
-            path="/users"
-            element={
-              <>
-                <h2>User Management</h2>
-                <UserForm addUser={addUser} />
-                <UserList users={users} updateUser={updateUser} deleteUser={deleteUser} />
-              </>
-            }
-          />
+          {/* Login Route */}
+          <Route path="/login" element={<LoginPage />} />
 
-          {/* Article Management Routes */}
-          <Route
-            path="/articles"
-            element={
-              <>
-                <h2>Article Management</h2>
-                <ArticleForm addArticle={addArticle} />
-                <ArticleList
-                  articles={articles}
-                  updateArticle={updateArticle}
-                  deleteArticle={deleteArticle}
-                />
-              </>
-            }
-          />
+          {/* User Management Routes (Only available when logged in) */}
+          {isLoggedIn && (
+            <>
+              <Route
+                path="/users"
+                element={
+                  <>
+                    <h2>User Management</h2>
+                    <UserForm addUser={addUser} />
+                    <UserList users={users} updateUser={updateUser} deleteUser={deleteUser} />
+                  </>
+                }
+              />
+
+              {/* Article Management Routes */}
+              <Route
+                path="/articles"
+                element={
+                  <>
+                    <h2>Article Management</h2>
+                    <ArticleForm addArticle={addArticle} />
+                    <ArticleList
+                      articles={articles}
+                      updateArticle={updateArticle}
+                      deleteArticle={deleteArticle}
+                    />
+                  </>
+                }
+              />
+            </>
+          )}
         </Routes>
-       
       </div>
     </div>
   );

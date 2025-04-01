@@ -1,34 +1,33 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { AuthContext } from "../auth_context";
 
 const LoginPage = () => {
+    const auth = useContext(AuthContext);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
-        e.preventDefault(); // Prevent form submission reload
+        e.preventDefault(); // 防止表单提交刷新页面
 
         try {
-            // Send a POST request to the backend login endpoint
             const response = await fetch("http://localhost:5000/api/users/login", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
             });
 
             const data = await response.json();
-
+            
             if (response.ok) {
-                // If login is successful, redirect to the manage system page
-                console.log("log in successfully ! :)")
-                navigate("/");
+                console.log("Login successful! 🎉");
+                auth.login(data.username); // 更新全局状态
+                localStorage.setItem("isLoggedIn", "true");
+                localStorage.setItem("userName", data.username);
+                navigate("/"); // 登录成功后跳转到首页
             } else {
-                // If login fails, display an error message
                 setError(data.message || "Login failed. Please try again.");
             }
         } catch (err) {
